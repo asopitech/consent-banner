@@ -48,7 +48,7 @@ function showSettings(): void { lastFocus = document.activeElement; dialog = el(
 function debug(): void { if (script()?.dataset.debug === 'true') console.info('Asopi consent debug', { measurementId: measurementId(), ga4: document.querySelectorAll('script[src*="gtag/js"]').length, gtm: document.querySelectorAll('script[src*="googletagmanager.com/gtm.js"]').length }); }
 function init(): void { window.dataLayer = window.dataLayer || []; window.gtag = gtag; window.gtag('consent', 'default', deniedPayload); const stored = readStored(); currentChoice = stored?.choice ?? 'unknown'; if (stored?.choice === 'granted') { window.gtag('consent', 'update', grantedPayload); void loadGa(); } if (!stored) showBanner(); debug(); }
 
-const api: Api = { reset: () => { safeRemove(); currentChoice = 'unknown'; configured = false; loadPromise = null; showBanner(); }, showSettings, getState: () => currentChoice };
+const api: Api = { reset: () => { safeRemove(); currentChoice = 'unknown'; configured = false; loadPromise = null; window.gtag('consent', 'update', deniedPayload); deleteGaCookies(); closeDialog(); removeBanner(); showBanner(); }, showSettings, getState: () => currentChoice };
 window.AsopiConsentBanner = api;
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 export { api as AsopiConsentBanner };
