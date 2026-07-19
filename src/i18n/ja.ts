@@ -1,0 +1,2 @@
+import type {ConsentMessages} from '../types';
+export const ja:ConsentMessages={title:'アクセス解析の設定',description:'このサイトでは、利用状況を把握し、サイトを改善するためにGoogle Analyticsを使用します。',allow:'分析を許可',reject:'拒否',learnMore:'詳細を見る',settingsTitle:'アクセス解析の設定',close:'閉じる',currentState:'現在の状態',unknown:'未選択',granted:'許可済み',denied:'拒否済み',purpose:'Google Analyticsは利用状況を把握し、サイトを改善する目的でのみ使用します。',privacyPolicy:'プライバシーポリシー',settingsLabel:'アクセス解析の設定'};

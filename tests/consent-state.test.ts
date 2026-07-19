@@ -1,0 +1,2 @@
+import {initGtag,updateGranted,updateDenied} from '../src/consent-state';
+test('default and updates use consent mode v2 fields',()=>{initGtag(); updateGranted(); updateDenied(); const calls=window.dataLayer as IArguments[]; expect(calls[0][0]).toBe('consent'); expect(calls[0][2]).toMatchObject({analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'}); expect(calls[1][2]).toMatchObject({analytics_storage:'granted',ad_storage:'denied'})});

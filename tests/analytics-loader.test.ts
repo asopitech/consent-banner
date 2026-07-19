@@ -1,0 +1,3 @@
+import {AnalyticsLoader} from '../src/analytics-loader';
+test('loads gtag once and configures once',async()=>{window.dataLayer=[]; window.gtag=(...a)=>window.dataLayer!.push(a); const l=new AnalyticsLoader(); const p=l.load('G-ABC123'); const script=document.querySelector('script[data-asopi-ga-loader="G-ABC123"]') as HTMLScriptElement; expect(script.src).toContain('googletagmanager.com/gtag/js?id=G-ABC123'); script.onload?.(new Event('load')); await p; await l.load('G-ABC123'); expect(document.querySelectorAll('script[data-asopi-ga-loader]').length).toBe(1); expect((window.dataLayer as unknown[][]).filter(c=>c[0]==='config').length).toBe(1)});
+test('concurrent load returns same promise',()=>{const l=new AnalyticsLoader(); expect(l.load('G-X')).toBe(l.load('G-X'))});

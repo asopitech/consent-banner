@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Consent demo</title>
+    <script
+      src="/dist/consent/v1/consent.js"
+      data-measurement-id="G-TEST123"
+      data-policy-url="/demo/privacy.html"
+      defer
+    ></script>
+  </head>
+  <body>
+    <h1>Page A</h1>
+    <a href="/demo/privacy.html">Privacy</a>
+    <button id="analytics-settings" type="button">アクセス解析の設定</button>
+    <script>
+      document
+        .querySelector('#analytics-settings')
+        ?.addEventListener('click', () => window.AsopiConsent?.openSettings());
+    </script>
+  </body>
+</html>

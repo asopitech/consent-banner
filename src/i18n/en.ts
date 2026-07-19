@@ -1,0 +1,2 @@
+import type {ConsentMessages} from '../types';
+export const en:ConsentMessages={title:'Analytics settings',description:'This site uses Google Analytics to understand usage and improve the site.',allow:'Allow analytics',reject:'Reject',learnMore:'Learn more',settingsTitle:'Analytics settings',close:'Close',currentState:'Current state',unknown:'Not selected',granted:'Allowed',denied:'Rejected',purpose:'Google Analytics is used only to understand usage and improve this site.',privacyPolicy:'Privacy policy',settingsLabel:'Analytics settings'};
