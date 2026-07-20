@@ -14,9 +14,7 @@
     "vite": "latest",
     "vitest": "latest"
   },
-  "dependencies": {
-    "vanilla-cookieconsent": "3.1.0"
-  },
+  "dependencies": {},
   "name": "@asopi-tech/consent-banner",
   "private": true
 }
