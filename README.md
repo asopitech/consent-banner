@@ -28,7 +28,7 @@ Publish these files:
   defer></script>
 ```
 
-Attributes: `data-measurement-id` must match `^G-[A-Z0-9]+$`; `data-consent-version` forces redisplay when changed; `data-policy-url` accepts only `http:` and `https:`; `data-debug="true"` logs existing GA4/GTM candidates without modifying them; `data-linker-domains` (optional) is a comma-separated domain list for cross-domain measurement; `data-lang="ja|en"` (optional) forces the UI language.
+Attributes: `data-measurement-id` must match `^G-[A-Z0-9]+$`; `data-consent-version` forces redisplay when changed; `data-policy-url` accepts only `http:` and `https:`; `data-debug="true"` logs existing GA4/GTM candidates without modifying them; `data-linker-domains` (optional) is a comma-separated domain list for cross-domain measurement; `data-lang="ja|en"` (optional) forces the UI language; `data-policy-url-ja` / `data-policy-url-en` (optional) override `data-policy-url` for the matching UI language, so English pages can link to an English policy.
 
 ## Theming
 

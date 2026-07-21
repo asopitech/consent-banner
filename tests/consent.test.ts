@@ -41,6 +41,16 @@ describe('consent banner', () => {
     expect([...(added[setIndex] ?? [])]).toEqual(['set', 'linker', { domains: ['asopi.tech', 'alopex-db.github.io'], accept_incoming: true }]);
     expect(configIndex).toBeGreaterThan(setIndex);
   });
+  it('uses the language-specific policy URL when provided', async () => {
+    const attrs = 'data-measurement-id="G-ABC123" data-policy-url="https://asopi.tech/privacy" data-policy-url-en="https://asopi.tech/en/privacy/"';
+    document.documentElement.lang = 'en';
+    await boot(attrs);
+    expect(document.querySelector('a')?.href).toBe('https://asopi.tech/en/privacy/');
+    document.documentElement.lang = 'ja';
+    await boot(attrs);
+    expect(document.querySelector('a')?.href).toBe('https://asopi.tech/privacy');
+    document.documentElement.lang = '';
+  });
   it('renders Japanese for ja documents and English otherwise', async () => {
     document.documentElement.lang = 'ja';
     await boot();
