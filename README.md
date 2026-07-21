@@ -52,7 +52,7 @@ Static HTML and GitHub Pages use the script tag above. In Astro, put the same ta
 
 ## Withdrawal and storage
 
-Consent is stored per-site in localStorage and is not shared between sites. localStorage failures fall back to memory for the current page. Withdrawal from granted to denied updates Consent Mode to denied and performs best-effort deletion limited to `_ga`, `_ga_*`, `_gid`, `_gat`, `_gac_*`, and `_gcl_*` cookies on the current host/path; parent-domain guessing and Public Suffix List logic are intentionally not included.
+Consent is stored per-site in localStorage and is not shared between sites. localStorage failures fall back to memory for the current page. Withdrawal from granted to denied updates Consent Mode to denied and performs best-effort deletion limited to `_ga`, `_ga_*`, `_gid`, `_gat`, `_gac_*`, and `_gcl_*` cookies on the current host/path — each cookie is expired both without a domain attribute and with `domain=location.hostname`, because gtag sets its cookies with an explicit domain; parent-domain guessing and Public Suffix List logic are intentionally not included.
 
 ## Verification
 
