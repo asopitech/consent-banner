@@ -25,7 +25,7 @@ describe('consent banner', () => {
 
     expect(document.querySelector('[role="region"]')).toBeTruthy();
     expect(window.AsopiConsentBanner.getState()).toBe('unknown');
-    expect(Array.from(window.dataLayer.at(-1) ?? [])).toEqual(['consent', 'update', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' }]);
+    expect([...(window.dataLayer.at(-1) ?? [])]).toEqual(['consent', 'update', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' }]);
     expect(document.cookie).not.toContain('_ga=');
   });
   it('deduplicates rapid allow clicks', async () => { await boot(); const allow = document.querySelector('button') as HTMLButtonElement; allow.click(); allow.click(); expect(document.querySelectorAll('script[src*="gtag/js"]')).toHaveLength(1); const configs = window.dataLayer.filter((x) => x[0] === 'config'); expect(configs).toHaveLength(0); });
@@ -38,7 +38,7 @@ describe('consent banner', () => {
     const added = window.dataLayer.slice(before);
     const setIndex = added.findIndex((entry) => entry[0] === 'set');
     const configIndex = added.findIndex((entry) => entry[0] === 'config');
-    expect(Array.from(added[setIndex] ?? [])).toEqual(['set', 'linker', { domains: ['asopi.tech', 'alopex-db.github.io'], accept_incoming: true }]);
+    expect([...(added[setIndex] ?? [])]).toEqual(['set', 'linker', { domains: ['asopi.tech', 'alopex-db.github.io'], accept_incoming: true }]);
     expect(configIndex).toBeGreaterThan(setIndex);
   });
   it('pushes gtag commands as Arguments objects, not arrays', async () => {
@@ -46,7 +46,7 @@ describe('consent banner', () => {
     const entry = window.dataLayer.at(-1);
     expect(entry).toBeTruthy();
     expect(Array.isArray(entry)).toBe(false);
-    expect(Array.from(entry ?? [])[0]).toBe('consent');
+    expect([...(entry ?? [])][0]).toBe('consent');
   });
   it('does not push linker without data-linker-domains', async () => {
     await boot();
