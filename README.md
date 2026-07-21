@@ -30,6 +30,10 @@ Publish these files:
 
 Attributes: `data-measurement-id` must match `^G-[A-Z0-9]+$`; `data-consent-version` forces redisplay when changed; `data-policy-url` accepts only `http:` and `https:`; `data-debug="true"` logs existing GA4/GTM candidates without modifying them; `data-linker-domains` (optional) is a comma-separated domain list for cross-domain measurement; `data-lang="ja|en"` (optional) forces the UI language.
 
+## Theming
+
+The stylesheet reads CSS custom properties so each site can match its brand without forking the CSS. Set any of these on `:root` (or a scheme-scoped selector such as `body[data-md-color-scheme="slate"]`): `--asopi-consent-bg`, `--asopi-consent-fg`, `--asopi-consent-border`, `--asopi-consent-accent` (primary button and links), `--asopi-consent-accent-contrast` (button text), `--asopi-consent-muted`, `--asopi-consent-radius`, `--asopi-consent-font`. Each color also has a `-dark` twin (e.g. `--asopi-consent-accent-dark`) used when `prefers-color-scheme: dark` matches. Unset values fall back to the built-in neutral palette.
+
 ## Language
 
 The banner and dialog render in Japanese when the document language (`<html lang>`) starts with `ja`, and in English otherwise; `navigator.language` is the fallback when the attribute is missing, and `data-lang` overrides both. Button labels are 許可する / 拒否する / 設定 (Allow / Decline / Settings), and the policy link renders inline at the end of the body text.
