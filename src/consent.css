@@ -14,6 +14,6 @@
 .asopi-consent-dialog::backdrop{background:#0008}
 .asopi-consent-dialog__actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .asopi-consent-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media (max-width:480px){.asopi-consent-banner{inset:auto .5rem .5rem;max-width:none;padding:1rem}.asopi-consent-banner__actions{display:grid;grid-template-columns:1fr 1fr}.asopi-consent-banner__actions button[data-variant=ghost]{grid-column:1/-1}}
+@media (max-width:480px){.asopi-consent-banner{inset:auto .5rem .5rem;max-width:none;padding:1rem}.asopi-consent-banner__actions{display:grid;grid-template-columns:1fr 1fr}}
 @media (prefers-color-scheme:dark){.asopi-consent-banner,.asopi-consent-dialog{--_bg:var(--asopi-consent-bg-dark,#0d1117);--_fg:var(--asopi-consent-fg-dark,#f0f6fc);--_border:var(--asopi-consent-border-dark,#30363d);--_accent:var(--asopi-consent-accent-dark,#1f6feb);--_accent-contrast:var(--asopi-consent-accent-contrast-dark,#fff);--_muted:var(--asopi-consent-muted-dark,#8b949e)}}
 @media (prefers-reduced-motion:no-preference){.asopi-consent-banner{transition:opacity .15s ease}}

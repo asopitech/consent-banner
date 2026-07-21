@@ -16,7 +16,7 @@ const STORAGE_KEY = 'asopiTechConsent';
 const MEASUREMENT_ID_RE = /^G-[A-Z0-9]+$/;
 const LINKER_DOMAIN_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/;
 type Lang = 'ja' | 'en';
-const STRINGS: Record<Lang, { region: string; title: string; body: string; policy: string; allow: string; deny: string; settings: string; dialogTitle: string; dialogBody: string; close: string }> = {
+const STRINGS: Record<Lang, { region: string; title: string; body: string; policy: string; allow: string; deny: string; dialogTitle: string; dialogBody: string; close: string }> = {
   ja: {
     region: 'Cookieの利用に関する同意',
     title: 'Cookieの利用について',
@@ -24,7 +24,6 @@ const STRINGS: Record<Lang, { region: string; title: string; body: string; polic
     policy: 'プライバシーポリシー',
     allow: '許可する',
     deny: '拒否する',
-    settings: '設定',
     dialogTitle: 'Cookie設定',
     dialogBody: 'アクセス解析Cookieの利用を選択してください。広告関連のストレージは常に無効のままです。',
     close: '閉じる',
@@ -36,7 +35,6 @@ const STRINGS: Record<Lang, { region: string; title: string; body: string; polic
     policy: 'Privacy policy',
     allow: 'Allow',
     deny: 'Decline',
-    settings: 'Settings',
     dialogTitle: 'Cookie settings',
     dialogBody: 'Choose whether analytics cookies may be used. Ad-related storage always stays disabled.',
     close: 'Close',
@@ -75,7 +73,7 @@ function el<K extends keyof HTMLElementTagNameMap>(name: K, text?: string): HTML
 function button(text: string, action: () => void, variant?: 'secondary' | 'ghost'): HTMLButtonElement { const b = el('button', text); if (variant) b.dataset.variant = variant; b.type = 'button'; b.addEventListener('click', action); return b; }
 function removeBanner(): void { banner?.remove(); banner = null; }
 function closeDialog(): void { if (dialog?.open) dialog.close(); dialog?.remove(); dialog = null; if (lastFocus instanceof HTMLElement) lastFocus.focus(); }
-function showBanner(): void { if (banner) return; const t = STRINGS[lang()]; const section = el('section'); section.className = 'asopi-consent-banner'; section.role = 'region'; section.ariaLabel = t.region; section.append(el('h2', t.title)); const body = el('p', t.body); const url = policyUrl(); if (url) { body.append(' '); const link = el('a', t.policy); link.href = url; body.append(link); } section.append(body); const actions = el('div'); actions.className = 'asopi-consent-banner__actions'; actions.append(button(t.allow, () => persist('granted')), button(t.deny, () => persist('denied'), 'secondary'), button(t.settings, showSettings, 'ghost')); section.append(actions); document.body.append(section); banner = section; }
+function showBanner(): void { if (banner) return; const t = STRINGS[lang()]; const section = el('section'); section.className = 'asopi-consent-banner'; section.role = 'region'; section.ariaLabel = t.region; section.append(el('h2', t.title)); const body = el('p', t.body); const url = policyUrl(); if (url) { body.append(' '); const link = el('a', t.policy); link.href = url; body.append(link); } section.append(body); const actions = el('div'); actions.className = 'asopi-consent-banner__actions'; actions.append(button(t.allow, () => persist('granted')), button(t.deny, () => persist('denied'), 'secondary')); section.append(actions); document.body.append(section); banner = section; }
 function showSettings(): void { const t = STRINGS[lang()]; lastFocus = document.activeElement; dialog = el('dialog'); dialog.className = 'asopi-consent-dialog'; dialog.setAttribute('aria-modal', 'true'); dialog.append(el('h2', t.dialogTitle)); dialog.append(el('p', t.dialogBody)); const actions = el('div'); actions.className = 'asopi-consent-dialog__actions'; actions.append(button(t.allow, () => persist('granted')), button(t.deny, () => persist('denied'), 'secondary'), button(t.close, closeDialog, 'ghost')); dialog.append(actions); dialog.addEventListener('cancel', (event) => { event.preventDefault(); closeDialog(); }); document.body.append(dialog); dialog.showModal(); (dialog.querySelector('button') as HTMLButtonElement | null)?.focus(); }
 function debug(): void { if (script()?.dataset.debug === 'true') console.info('Asopi consent debug', { measurementId: measurementId(), ga4: document.querySelectorAll('script[src*="gtag/js"]').length, gtm: document.querySelectorAll('script[src*="googletagmanager.com/gtm.js"]').length }); }
 function init(): void { window.dataLayer = window.dataLayer || []; window.gtag = gtag; window.gtag('consent', 'default', deniedPayload); const stored = readStored(); currentChoice = stored?.choice ?? 'unknown'; if (stored?.choice === 'granted') { window.gtag('consent', 'update', grantedPayload); void loadGa(); } if (!stored) showBanner(); debug(); }

@@ -36,7 +36,7 @@ The stylesheet reads CSS custom properties so each site can match its brand with
 
 ## Language
 
-The banner and dialog render in Japanese when the document language (`<html lang>`) starts with `ja`, and in English otherwise; `navigator.language` is the fallback when the attribute is missing, and `data-lang` overrides both. Button labels are 許可する / 拒否する / 設定 (Allow / Decline / Settings), and the policy link renders inline at the end of the body text.
+The banner and dialog render in Japanese when the document language (`<html lang>`) starts with `ja`, and in English otherwise; `navigator.language` is the fallback when the attribute is missing, and `data-lang` overrides both. The banner offers only 許可する / 拒否する (Allow / Decline) — the settings dialog repeats the same binary choice, so it is not linked from the banner; open it later via `AsopiConsentBanner.showSettings()`, typically from a footer link. The policy link renders inline at the end of the body text.
 
 ## Cross-domain measurement
 

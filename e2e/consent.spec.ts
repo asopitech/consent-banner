@@ -13,12 +13,14 @@ test('page navigation and denied path have no google requests', async ({ page })
 
 test('settings dialog supports escape and focus return', async ({ page }) => {
   await page.goto('/demo/a.html');
-  await page.getByText('設定', { exact: true }).click();
+  await expect(page.getByRole('region')).toBeVisible();
+  await page.getByRole('link', { name: 'Page B' }).focus();
+  await page.evaluate(() => window.AsopiConsentBanner.showSettings());
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Tab');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toBeHidden();
-  await expect(page.getByText('設定', { exact: true })).toBeFocused();
+  await expect(page.getByRole('link', { name: 'Page B' })).toBeFocused();
 });
 
 test('built bundle exposes the public API on window', async ({ page }) => {
