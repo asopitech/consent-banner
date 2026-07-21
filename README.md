@@ -50,6 +50,12 @@ Use Tag Assistant, DevTools Network, and Application/Cookies. Before consent or 
 
 Example: `script-src 'self' https://assets.asopi.tech https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com; img-src 'self' https://www.google-analytics.com; style-src 'self' https://assets.asopi.tech 'unsafe-inline';`.
 
+## GitHub Pages deployment setup
+
+Set up GitHub Pages from the repository settings first, then adapt the generated workflow. In GitHub, open **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**, select the generated **Static HTML** workflow rather than Jekyll, and then keep this repository's `pages` workflow as the customized version. The customization adds Node setup, linting, tests, Vite build, distribution verification, Playwright checks, and publishes the generated `dist/` artifact.
+
+If GitHub Pages is disabled or the source is not set to GitHub Actions, `actions/configure-pages` can fail with `Get Pages site failed: Not Found` before artifact upload or deployment. This is a repository setting issue, not a build issue.
+
 ## Build, test, release
 
 Run `npm ci`, `npm run lint`, `npm test`, `npm run build`, `npm run verify`, and `npx playwright test`. Versioned assets live under `consent/v1/`; breaking public API or behavior changes should use a new path such as `v2`.
