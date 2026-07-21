@@ -15,6 +15,33 @@ type Api = { reset: () => void; showSettings: () => void; getState: () => Consen
 const STORAGE_KEY = 'asopiTechConsent';
 const MEASUREMENT_ID_RE = /^G-[A-Z0-9]+$/;
 const LINKER_DOMAIN_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/;
+type Lang = 'ja' | 'en';
+const STRINGS: Record<Lang, { region: string; title: string; body: string; policy: string; allow: string; deny: string; settings: string; dialogTitle: string; dialogBody: string; close: string }> = {
+  ja: {
+    region: 'Cookieの利用に関する同意',
+    title: 'Cookieの利用について',
+    body: '当サイトでは、サイト改善のためのアクセス解析（Google Analytics 4）にCookieを使用します。「許可する」を選ぶまでGoogleのタグは読み込まれず、広告目的のCookieは一切使用しません。',
+    policy: 'プライバシーポリシー',
+    allow: '許可する',
+    deny: '拒否する',
+    settings: '設定',
+    dialogTitle: 'Cookie設定',
+    dialogBody: 'アクセス解析Cookieの利用を選択してください。広告関連のストレージは常に無効のままです。',
+    close: '閉じる',
+  },
+  en: {
+    region: 'Cookie consent',
+    title: 'About cookies on this site',
+    body: 'We use cookies for analytics (Google Analytics 4) to improve this site. No Google tags are loaded until you choose "Allow", and we never use advertising cookies.',
+    policy: 'Privacy policy',
+    allow: 'Allow',
+    deny: 'Decline',
+    settings: 'Settings',
+    dialogTitle: 'Cookie settings',
+    dialogBody: 'Choose whether analytics cookies may be used. Ad-related storage always stays disabled.',
+    close: 'Close',
+  },
+};
 const deniedPayload: ConsentPayload = { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' };
 const grantedPayload: ConsentPayload = { ...deniedPayload, analytics_storage: 'granted' };
 let memoryValue: string | null = null;
@@ -36,6 +63,7 @@ function script(): HTMLScriptElement { return document.currentScript instanceof 
 function version(): string { return script()?.dataset.consentVersion || '1'; }
 function measurementId(): string | null { const id = script()?.dataset.measurementId || ''; return MEASUREMENT_ID_RE.test(id) ? id : null; }
 function linkerDomains(): string[] { const raw = script()?.dataset.linkerDomains || ''; return raw.split(',').map((item) => item.trim().toLowerCase()).filter((item) => LINKER_DOMAIN_RE.test(item)); }
+function lang(): Lang { const forced = script()?.dataset.lang; if (forced === 'ja' || forced === 'en') return forced; const value = document.documentElement.lang || navigator.language || 'en'; return value.toLowerCase().startsWith('ja') ? 'ja' : 'en'; }
 function policyUrl(): string | null { const raw = script()?.dataset.policyUrl; if (!raw) return null; try { const url = new URL(raw, location.href); return ['http:', 'https:'].includes(url.protocol) ? url.href : null; } catch { return null; } }
 function readStored(): StoredConsent | null { const raw = safeGet(); if (!raw) return null; try { const parsed = JSON.parse(raw) as Partial<StoredConsent>; if (parsed.version === version() && (parsed.choice === 'granted' || parsed.choice === 'denied') && typeof parsed.updatedAt === 'string') return parsed as StoredConsent; } catch { return null; } return null; }
 function dispatch(choice: Exclude<ConsentChoice, 'unknown'>): void { window.dispatchEvent(new CustomEvent('asopi-consent-change', { detail: { choice, version: version() } })); }
@@ -44,11 +72,11 @@ function loadGa(): Promise<void> { const id = measurementId(); if (!id) return P
 function persist(choice: Exclude<ConsentChoice, 'unknown'>): void { currentChoice = choice; safeSet(JSON.stringify({ version: version(), choice, updatedAt: new Date().toISOString() })); window.gtag('consent', 'update', choice === 'granted' ? grantedPayload : deniedPayload); if (choice === 'denied') deleteGaCookies(); if (choice === 'granted') void loadGa(); dispatch(choice); removeBanner(); closeDialog(); }
 function deleteGaCookies(): void { for (const item of document.cookie.split(';')) { const name = item.split('=')[0]?.trim(); if (name && /^(_ga(_.*)?|_gid|_gat|_gac_.*|_gcl_.*)$/.test(name)) document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`; } }
 function el<K extends keyof HTMLElementTagNameMap>(name: K, text?: string): HTMLElementTagNameMap[K] { const node = document.createElement(name); if (text) node.textContent = text; return node; }
-function button(text: string, action: () => void, secondary = false): HTMLButtonElement { const b = el('button', text); if (secondary) b.dataset.variant = 'secondary'; b.type = 'button'; b.addEventListener('click', action); return b; }
+function button(text: string, action: () => void, variant?: 'secondary' | 'ghost'): HTMLButtonElement { const b = el('button', text); if (variant) b.dataset.variant = variant; b.type = 'button'; b.addEventListener('click', action); return b; }
 function removeBanner(): void { banner?.remove(); banner = null; }
 function closeDialog(): void { if (dialog?.open) dialog.close(); dialog?.remove(); dialog = null; if (lastFocus instanceof HTMLElement) lastFocus.focus(); }
-function showBanner(): void { if (banner) return; const section = el('section'); section.className = 'asopi-consent-banner'; section.role = 'region'; section.ariaLabel = 'Cookie consent'; section.append(el('h2', 'アクセス解析への同意')); section.append(el('p', 'Asopi Techは、許可された場合のみGoogle Analytics 4を読み込みます。拒否または未選択ではGoogleタグを読み込みません。')); const url = policyUrl(); if (url) { const link = el('a', '詳細を見る'); link.href = url; section.append(link); } const actions = el('div'); actions.className = 'asopi-consent-banner__actions'; actions.append(button('分析を許可', () => persist('granted')), button('拒否', () => persist('denied'), true), button('設定', showSettings, true)); section.append(actions); document.body.append(section); banner = section; }
-function showSettings(): void { lastFocus = document.activeElement; dialog = el('dialog'); dialog.className = 'asopi-consent-dialog'; dialog.setAttribute('aria-modal', 'true'); dialog.append(el('h2', '同意設定')); dialog.append(el('p', '分析Cookieの利用を選択してください。広告関連ストレージは常にdeniedです。')); const actions = el('div'); actions.className = 'asopi-consent-dialog__actions'; actions.append(button('分析を許可', () => persist('granted')), button('拒否', () => persist('denied'), true), button('閉じる', closeDialog, true)); dialog.append(actions); dialog.addEventListener('cancel', (event) => { event.preventDefault(); closeDialog(); }); document.body.append(dialog); dialog.showModal(); (dialog.querySelector('button') as HTMLButtonElement | null)?.focus(); }
+function showBanner(): void { if (banner) return; const t = STRINGS[lang()]; const section = el('section'); section.className = 'asopi-consent-banner'; section.role = 'region'; section.ariaLabel = t.region; section.append(el('h2', t.title)); const body = el('p', t.body); const url = policyUrl(); if (url) { body.append(' '); const link = el('a', t.policy); link.href = url; body.append(link); } section.append(body); const actions = el('div'); actions.className = 'asopi-consent-banner__actions'; actions.append(button(t.allow, () => persist('granted')), button(t.deny, () => persist('denied'), 'secondary'), button(t.settings, showSettings, 'ghost')); section.append(actions); document.body.append(section); banner = section; }
+function showSettings(): void { const t = STRINGS[lang()]; lastFocus = document.activeElement; dialog = el('dialog'); dialog.className = 'asopi-consent-dialog'; dialog.setAttribute('aria-modal', 'true'); dialog.append(el('h2', t.dialogTitle)); dialog.append(el('p', t.dialogBody)); const actions = el('div'); actions.className = 'asopi-consent-dialog__actions'; actions.append(button(t.allow, () => persist('granted')), button(t.deny, () => persist('denied'), 'secondary'), button(t.close, closeDialog, 'ghost')); dialog.append(actions); dialog.addEventListener('cancel', (event) => { event.preventDefault(); closeDialog(); }); document.body.append(dialog); dialog.showModal(); (dialog.querySelector('button') as HTMLButtonElement | null)?.focus(); }
 function debug(): void { if (script()?.dataset.debug === 'true') console.info('Asopi consent debug', { measurementId: measurementId(), ga4: document.querySelectorAll('script[src*="gtag/js"]').length, gtm: document.querySelectorAll('script[src*="googletagmanager.com/gtm.js"]').length }); }
 function init(): void { window.dataLayer = window.dataLayer || []; window.gtag = gtag; window.gtag('consent', 'default', deniedPayload); const stored = readStored(); currentChoice = stored?.choice ?? 'unknown'; if (stored?.choice === 'granted') { window.gtag('consent', 'update', grantedPayload); void loadGa(); } if (!stored) showBanner(); debug(); }
 

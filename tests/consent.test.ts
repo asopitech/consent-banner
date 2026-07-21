@@ -41,6 +41,15 @@ describe('consent banner', () => {
     expect([...(added[setIndex] ?? [])]).toEqual(['set', 'linker', { domains: ['asopi.tech', 'alopex-db.github.io'], accept_incoming: true }]);
     expect(configIndex).toBeGreaterThan(setIndex);
   });
+  it('renders Japanese for ja documents and English otherwise', async () => {
+    document.documentElement.lang = 'ja';
+    await boot();
+    expect(document.querySelector('h2')?.textContent).toBe('Cookieの利用について');
+    document.documentElement.lang = 'en';
+    await boot();
+    expect(document.querySelector('h2')?.textContent).toBe('About cookies on this site');
+    document.documentElement.lang = '';
+  });
   it('pushes gtag commands as Arguments objects, not arrays', async () => {
     await boot();
     const entry = window.dataLayer.at(-1);

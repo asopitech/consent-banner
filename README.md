@@ -28,7 +28,11 @@ Publish these files:
   defer></script>
 ```
 
-Attributes: `data-measurement-id` must match `^G-[A-Z0-9]+$`; `data-consent-version` forces redisplay when changed; `data-policy-url` accepts only `http:` and `https:`; `data-debug="true"` logs existing GA4/GTM candidates without modifying them; `data-linker-domains` (optional) is a comma-separated domain list for cross-domain measurement.
+Attributes: `data-measurement-id` must match `^G-[A-Z0-9]+$`; `data-consent-version` forces redisplay when changed; `data-policy-url` accepts only `http:` and `https:`; `data-debug="true"` logs existing GA4/GTM candidates without modifying them; `data-linker-domains` (optional) is a comma-separated domain list for cross-domain measurement; `data-lang="ja|en"` (optional) forces the UI language.
+
+## Language
+
+The banner and dialog render in Japanese when the document language (`<html lang>`) starts with `ja`, and in English otherwise; `navigator.language` is the fallback when the attribute is missing, and `data-lang` overrides both. Button labels are 許可する / 拒否する / 設定 (Allow / Decline / Settings), and the policy link renders inline at the end of the body text.
 
 ## Cross-domain measurement
 

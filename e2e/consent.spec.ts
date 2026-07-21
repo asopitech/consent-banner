@@ -4,8 +4,8 @@ test('page navigation and denied path have no google requests', async ({ page })
   const google: string[] = [];
   page.on('request', (request) => { if (request.url().includes('google')) google.push(request.url()); });
   await page.goto('/demo/a.html');
-  await expect(page.getByRole('region', { name: 'Cookie consent' })).toBeVisible();
-  await page.getByText('拒否', { exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Cookieの利用に関する同意' })).toBeVisible();
+  await page.getByText('拒否する', { exact: true }).click();
   await page.getByRole('link', { name: 'Page B' }).click();
   await expect(page).toHaveURL(/b\.html$/);
   expect(google).toEqual([]);
