@@ -51,6 +51,13 @@ describe('consent banner', () => {
     expect(document.querySelector('a')?.href).toBe('https://asopi.tech/privacy');
     document.documentElement.lang = '';
   });
+  it('shows the policy link in the settings dialog', async () => {
+    await boot('data-measurement-id="G-ABC123" data-policy-url="https://asopi.tech/privacy"');
+    if (!HTMLDialogElement.prototype.showModal) HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', ''); };
+    window.AsopiConsentBanner.showSettings();
+    const link = document.querySelector('.asopi-consent-dialog a') as HTMLAnchorElement | null;
+    expect(link?.href).toBe('https://asopi.tech/privacy');
+  });
   it('renders Japanese for ja documents and English otherwise', async () => {
     document.documentElement.lang = 'ja';
     await boot();

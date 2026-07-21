@@ -17,6 +17,7 @@ test('settings dialog supports escape and focus return', async ({ page }) => {
   await page.getByRole('link', { name: 'Page B' }).focus();
   await page.evaluate(() => window.AsopiConsentBanner.showSettings());
   await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByRole('dialog').getByRole('link')).toHaveAttribute('href', 'https://example.com/privacy');
   await page.keyboard.press('Tab');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toBeHidden();

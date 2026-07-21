@@ -10,7 +10,7 @@
 .asopi-consent-dialog{max-width:min(92vw,26rem);box-sizing:border-box;border:1px solid var(--_border);border-radius:var(--_radius);padding:1.25rem;background:var(--_bg);color:var(--_fg);font-family:var(--_font);font-size:.875rem;line-height:1.6}
 .asopi-consent-dialog h2{margin:0 0 .5rem;font-size:1rem;font-weight:600;line-height:1.4;color:inherit}
 .asopi-consent-dialog p{margin:0 0 1rem;color:inherit}
-.asopi-consent-dialog a{color:var(--_accent)}
+.asopi-consent-dialog a{color:var(--_accent);text-decoration:underline}
 .asopi-consent-dialog::backdrop{background:#0008}
 .asopi-consent-dialog__actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .asopi-consent-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
