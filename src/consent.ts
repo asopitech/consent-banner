@@ -4,7 +4,8 @@ type ConsentChoice = 'granted' | 'denied' | 'unknown';
 type StoredConsent = { version: string; choice: Exclude<ConsentChoice, 'unknown'>; updatedAt: string };
 type ConsentState = 'denied' | 'granted';
 type ConsentPayload = { analytics_storage: ConsentState; ad_storage: 'denied'; ad_user_data: 'denied'; ad_personalization: 'denied' };
-type GtagCommand = ['consent', 'default' | 'update', ConsentPayload] | ['js', Date] | ['config', string];
+type LinkerPayload = { domains: string[]; accept_incoming: boolean };
+type GtagCommand = ['consent', 'default' | 'update', ConsentPayload] | ['js', Date] | ['config', string] | ['set', 'linker', LinkerPayload];
 type Gtag = (...args: GtagCommand) => void;
 
 declare global { interface Window { dataLayer: GtagCommand[]; gtag: Gtag; AsopiConsentBanner: Api } }
@@ -13,6 +14,7 @@ type Api = { reset: () => void; showSettings: () => void; getState: () => Consen
 
 const STORAGE_KEY = 'asopiTechConsent';
 const MEASUREMENT_ID_RE = /^G-[A-Z0-9]+$/;
+const LINKER_DOMAIN_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/;
 const deniedPayload: ConsentPayload = { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' };
 const grantedPayload: ConsentPayload = { ...deniedPayload, analytics_storage: 'granted' };
 let memoryValue: string | null = null;
@@ -32,11 +34,12 @@ function safeRemove(): void { memoryValue = null; try { window.localStorage.remo
 function script(): HTMLScriptElement { return document.currentScript instanceof HTMLScriptElement ? document.currentScript : document.querySelector('script[data-asopi-consent]') as HTMLScriptElement; }
 function version(): string { return script()?.dataset.consentVersion || '1'; }
 function measurementId(): string | null { const id = script()?.dataset.measurementId || ''; return MEASUREMENT_ID_RE.test(id) ? id : null; }
+function linkerDomains(): string[] { const raw = script()?.dataset.linkerDomains || ''; return raw.split(',').map((item) => item.trim().toLowerCase()).filter((item) => LINKER_DOMAIN_RE.test(item)); }
 function policyUrl(): string | null { const raw = script()?.dataset.policyUrl; if (!raw) return null; try { const url = new URL(raw, location.href); return ['http:', 'https:'].includes(url.protocol) ? url.href : null; } catch { return null; } }
 function readStored(): StoredConsent | null { const raw = safeGet(); if (!raw) return null; try { const parsed = JSON.parse(raw) as Partial<StoredConsent>; if (parsed.version === version() && (parsed.choice === 'granted' || parsed.choice === 'denied') && typeof parsed.updatedAt === 'string') return parsed as StoredConsent; } catch { return null; } return null; }
 function dispatch(choice: Exclude<ConsentChoice, 'unknown'>): void { window.dispatchEvent(new CustomEvent('asopi-consent-change', { detail: { choice, version: version() } })); }
 
-function loadGa(): Promise<void> { const id = measurementId(); if (!id) return Promise.resolve(); if (configured) return Promise.resolve(); if (loadPromise) return loadPromise; const existing = document.querySelector(`script[data-asopi-ga4="${id}"]`); loadPromise = new Promise((resolve, reject) => { if (existing) { resolve(); return; } const s = document.createElement('script'); s.async = true; s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`; s.dataset.asopiGa4 = id; s.onload = () => resolve(); s.onerror = () => reject(new Error('Failed to load GA4')); document.head.append(s); }); return loadPromise.then(() => { if (!configured) { window.gtag('js', new Date()); window.gtag('config', id); configured = true; } }); }
+function loadGa(): Promise<void> { const id = measurementId(); if (!id) return Promise.resolve(); if (configured) return Promise.resolve(); if (loadPromise) return loadPromise; const existing = document.querySelector(`script[data-asopi-ga4="${id}"]`); loadPromise = new Promise((resolve, reject) => { if (existing) { resolve(); return; } const s = document.createElement('script'); s.async = true; s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`; s.dataset.asopiGa4 = id; s.onload = () => resolve(); s.onerror = () => reject(new Error('Failed to load GA4')); document.head.append(s); }); return loadPromise.then(() => { if (!configured) { window.gtag('js', new Date()); const domains = linkerDomains(); if (domains.length > 0) window.gtag('set', 'linker', { domains, accept_incoming: true }); window.gtag('config', id); configured = true; } }); }
 function persist(choice: Exclude<ConsentChoice, 'unknown'>): void { currentChoice = choice; safeSet(JSON.stringify({ version: version(), choice, updatedAt: new Date().toISOString() })); window.gtag('consent', 'update', choice === 'granted' ? grantedPayload : deniedPayload); if (choice === 'denied') deleteGaCookies(); if (choice === 'granted') void loadGa(); dispatch(choice); removeBanner(); closeDialog(); }
 function deleteGaCookies(): void { for (const item of document.cookie.split(';')) { const name = item.split('=')[0]?.trim(); if (name && /^(_ga(_.*)?|_gid|_gat|_gac_.*|_gcl_.*)$/.test(name)) document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`; } }
 function el<K extends keyof HTMLElementTagNameMap>(name: K, text?: string): HTMLElementTagNameMap[K] { const node = document.createElement(name); if (text) node.textContent = text; return node; }

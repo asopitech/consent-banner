@@ -28,7 +28,11 @@ Publish these files:
   defer></script>
 ```
 
-Attributes: `data-measurement-id` must match `^G-[A-Z0-9]+$`; `data-consent-version` forces redisplay when changed; `data-policy-url` accepts only `http:` and `https:`; `data-debug="true"` logs existing GA4/GTM candidates without modifying them.
+Attributes: `data-measurement-id` must match `^G-[A-Z0-9]+$`; `data-consent-version` forces redisplay when changed; `data-policy-url` accepts only `http:` and `https:`; `data-debug="true"` logs existing GA4/GTM candidates without modifying them; `data-linker-domains` (optional) is a comma-separated domain list for cross-domain measurement.
+
+## Cross-domain measurement
+
+Set `data-linker-domains="asopi.tech,example.github.io"` to enable the gtag linker across sites that share the same measurement ID. After analytics consent is granted, the banner pushes `gtag('set', 'linker', { domains, accept_incoming: true })` before the `config` command, so outbound links to the listed domains are decorated with the `_gl` parameter and incoming decorated navigations are accepted. Invalid entries are dropped; the attribute has no effect before consent because Google tags are not loaded at all.
 
 ## Examples
 

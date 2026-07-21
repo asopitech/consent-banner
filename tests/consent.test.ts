@@ -29,4 +29,26 @@ describe('consent banner', () => {
     expect(document.cookie).not.toContain('_ga=');
   });
   it('deduplicates rapid allow clicks', async () => { await boot(); const allow = document.querySelector('button') as HTMLButtonElement; allow.click(); allow.click(); expect(document.querySelectorAll('script[src*="gtag/js"]')).toHaveLength(1); const configs = window.dataLayer.filter((x) => x[0] === 'config'); expect(configs).toHaveLength(0); });
+  it('pushes linker domains before config when granted', async () => {
+    await boot('data-measurement-id="G-ABC123" data-consent-version="1" data-linker-domains="asopi.tech, Alopex-DB.github.io,,bad domain"');
+    const before = window.dataLayer.length;
+    (document.querySelector('button') as HTMLButtonElement).click();
+    (document.querySelector('script[src*="gtag/js"]') as HTMLScriptElement).dispatchEvent(new Event('load'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const added = window.dataLayer.slice(before);
+    const setIndex = added.findIndex((entry) => entry[0] === 'set');
+    const configIndex = added.findIndex((entry) => entry[0] === 'config');
+    expect(added[setIndex]).toEqual(['set', 'linker', { domains: ['asopi.tech', 'alopex-db.github.io'], accept_incoming: true }]);
+    expect(configIndex).toBeGreaterThan(setIndex);
+  });
+  it('does not push linker without data-linker-domains', async () => {
+    await boot();
+    const before = window.dataLayer.length;
+    (document.querySelector('button') as HTMLButtonElement).click();
+    (document.querySelector('script[src*="gtag/js"]') as HTMLScriptElement).dispatchEvent(new Event('load'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const added = window.dataLayer.slice(before);
+    expect(added.some((entry) => entry[0] === 'set')).toBe(false);
+    expect(added.some((entry) => entry[0] === 'config')).toBe(true);
+  });
 });
