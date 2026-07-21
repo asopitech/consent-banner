@@ -25,7 +25,8 @@ let dialog: HTMLDialogElement | null = null;
 let lastFocus: Element | null = null;
 let currentChoice: ConsentChoice = 'unknown';
 
-function gtag(...args: GtagCommand): void { window.dataLayer.push(args); }
+// gtag.js only processes commands pushed as Arguments objects; plain arrays are silently ignored
+function gtag(...args: GtagCommand): void { window.dataLayer.push(arguments as unknown as GtagCommand); }
 
 function safeGet(): string | null { try { return window.localStorage.getItem(STORAGE_KEY) ?? memoryValue; } catch { return memoryValue; } }
 function safeSet(value: string): void { memoryValue = value; try { window.localStorage.setItem(STORAGE_KEY, value); } catch { /* memory fallback */ } }
