@@ -62,9 +62,11 @@ describe('consent banner', () => {
     document.documentElement.lang = 'ja';
     await boot();
     expect(document.querySelector('h2')?.textContent).toBe('Cookieの利用について');
+    expect(document.querySelector('.asopi-consent-banner p')?.textContent).toContain('Cookie を使わない閲覧数の集計（Vercel Web Analytics）を、同意の選択を待たずに行います。');
     document.documentElement.lang = 'en';
     await boot();
     expect(document.querySelector('h2')?.textContent).toBe('About cookies on this site');
+    expect(document.querySelector('.asopi-consent-banner p')?.textContent).toContain('we collect cookieless visit counts (Vercel Web Analytics) without waiting for this choice.');
     document.documentElement.lang = '';
   });
   it('pushes gtag commands as Arguments objects, not arrays', async () => {

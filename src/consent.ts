@@ -20,7 +20,7 @@ const STRINGS: Record<Lang, { region: string; title: string; body: string; polic
   ja: {
     region: 'Cookieの利用に関する同意',
     title: 'Cookieの利用について',
-    body: '当サイトでは、サイト改善のためのアクセス解析（Google Analytics 4）にCookieを使用します。「許可する」を選ぶまでGoogleのタグは読み込まれず、広告目的のCookieは一切使用しません。',
+    body: '当サイトでは、サイト改善のためのアクセス解析（Google Analytics 4）に Cookie を使用します。「許可する」を選ぶまで Google のタグは読み込まれず、広告目的の Cookie は一切使用しません。このほか、Cookie を使わない閲覧数の集計（Vercel Web Analytics）を、同意の選択を待たずに行います。詳細はプライバシーポリシーをご覧ください。',
     policy: 'プライバシーポリシー',
     allow: '許可する',
     deny: '拒否する',
@@ -31,7 +31,7 @@ const STRINGS: Record<Lang, { region: string; title: string; body: string; polic
   en: {
     region: 'Cookie consent',
     title: 'About cookies on this site',
-    body: 'We use cookies for analytics (Google Analytics 4) to improve this site. No Google tags are loaded until you choose "Allow", and we never use advertising cookies.',
+    body: 'We use cookies for analytics (Google Analytics 4) to improve this site. No Google tags are loaded until you choose "Allow", and we never use advertising cookies. In addition, we collect cookieless visit counts (Vercel Web Analytics) without waiting for this choice. See the privacy policy for details.',
     policy: 'Privacy policy',
     allow: 'Allow',
     deny: 'Decline',
